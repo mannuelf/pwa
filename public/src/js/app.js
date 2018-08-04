@@ -32,6 +32,25 @@ fetch('https://httpbin.org/get')
   console.log('[fetch error]', err)
 })
 
+fetch('https://httpbin.org/post', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  body: JSON.stringify({message: 'Its working nice nice nice'})
+})
+  .then(function(response) {
+    console.log('[post]', response)
+    return response.json()
+})
+.then(function(data) {
+  console.log('[post data]', data)
+})
+.catch(function(err) {
+  console.log('[post error]', err)
+})
+
 var promise = new Promise(function(resolve, reject) {
   setTimeout(function() {
     // resolve('This is executed once the timer is done!')
