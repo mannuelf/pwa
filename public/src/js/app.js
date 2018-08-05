@@ -1,72 +1,24 @@
-let deferredPrompt
+
+var deferredPrompt;
+
+if (!window.Promise) {
+  window.Promise = Promise;
+}
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/sw.js')
-    // .register('/sw.js', { scope: '/someDir'})
-    .then(function() {
-      console.log('serviceWorker Registered');
+    .then(function () {
+      console.log('Service worker registered!');
     })
-    .catch(function(e) {
-      console.log('[Service Worker] Error: ', e)
-    })
+    .catch(function(err) {
+      console.log(err);
+    });
 }
 
 window.addEventListener('beforeinstallprompt', function(event) {
-  console.log('beforeinstallprompt fired')
-  event.preventDefault()
-  deferredPrompt = event
-  return false
-})
-
-
-fetch('https://httpbin.org/get')
-  .then(function(response) {
-    console.log('[fetch]', response)
-    return response.json()
-})
-.then(function(data) {
-  console.log('[fetch data]', data)
-})
-.catch(function(err) {
-  console.log('[fetch error]', err)
-})
-
-fetch('https://httpbin.org/post', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  mode: 'cors',
-  body: JSON.stringify({message: 'Its working nice nice nice'})
-})
-  .then(function(response) {
-    console.log('[post]', response)
-    return response.json()
-})
-.then(function(data) {
-  console.log('[post data]', data)
-})
-.catch(function(err) {
-  console.log('[post error]', err)
-})
-
-var promise = new Promise(function(resolve, reject) {
-  setTimeout(function() {
-    // resolve('This is executed once the timer is done!')
-    reject({ code: 500, message: 'An ERROR occurred!' })
-    // console.log('executed after 3 seconds');
-  }, 3000)
-})
-
-promise.then(function(text) {
-  return text
-}, function(err) {
-  console.log(err.code, err.message)
-}).then(function(newText) {
-  console.log(newText)
-})
-
-console.log('This is executed right after setTimeout');
-
+  console.log('beforeinstallprompt fired');
+  event.preventDefault();
+  deferredPrompt = event;
+  return false;
+});

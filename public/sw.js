@@ -1,16 +1,29 @@
-
-// life cycle events [install, activate ]
-self.addEventListener('install', function(event) {
-    console.log('[Service worker] Installing Service Worker...', event);
+self.addEventListener('install', function (event) {
+    console.log('[Service Worker] Installing Service Worker ...', event);
+    event.waitUntil(
+        caches.open('static')
+            .then(function(cache) {
+                console.log('[Service Worker] Pre-caching static assets')
+                cache.add('/src/js/app.js')
+            })
+    ) // wait for cache installation before opening
 })
 
-self.addEventListener('activate', function(event) {
-    console.log('[Service worker] Activating Service Worker...', event);
+self.addEventListener('activate', function (event) {
+    console.log('[Service Worker] Activating Service Worker ....', event);
     return self.clients.claim();
 })
 
-// service worker is a network proxy
-self.addEventListener('fetch', function(event) {
-    console.log('[Service Worker]', event);
-    event.respondWith(fetch(event.request));
+self.addEventListener('fetch', function (event) {
+    event.respondWith(
+        // requests are the keys, request object
+        caches.match(event.request)
+            .then(function(response) {
+                if (response) {
+                    return response
+                } else {
+                    return fetch(event.request)
+                }
+            })
+    );
 })
