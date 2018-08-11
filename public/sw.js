@@ -1,5 +1,5 @@
-const CACHE_STATIC_NAME = 'static-00'
-const CACHE_DYNAMIC_NAME = 'dynamic-00'
+const CACHE_STATIC_NAME = 'static-07'
+const CACHE_DYNAMIC_NAME = 'dynamic-07'
 
 self.addEventListener('install', function (event) {
     console.log('[Service Worker] Installing Service Worker ...', event);
@@ -10,6 +10,7 @@ self.addEventListener('install', function (event) {
             cache.addAll([
                 '/',
                 '/index.html',
+                '/offline.html',
                 '/src/js/app.js',
                 '/src/js/feed.js',
                 '/src/js/material.min.js',
@@ -28,14 +29,14 @@ self.addEventListener('activate', function (event) {
     console.log('[Service Worker] Activating Service Worker ....', event);
     event.waitUntil(
         caches.keys()
-            .then(function(keyList) {
-                return Promise.all(keyList.map(function(key) {
-                    if (key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME) {
-                        console.log('[Service Worker] Removing old cache.', key)
-                        return caches.delete(key)
-                    }
-                })) // waits for all the promises to finish
-            })
+        .then(function (keyList) {
+            return Promise.all(keyList.map(function (key) {
+                if (key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME) {
+                    console.log('[Service Worker] Removing old cache.', key)
+                    return caches.delete(key)
+                }
+            })) // waits for all the promises to finish
+        })
     )
     return self.clients.claim();
 })
@@ -56,6 +57,10 @@ self.addEventListener('fetch', function (event) {
                             })
                     })
                     .catch(function (err) {
+                        return caches.open(CACHE_STATIC_NAME)
+                            .then(function(cache) {
+                                return cache.match('/offline.html')
+                            })
                         console.log('error: ', err)
                     })
             }
