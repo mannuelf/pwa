@@ -1,4 +1,4 @@
-const CACHE_STATIC_NAME = 'static-07'
+const CACHE_STATIC_NAME = 'static-08'
 const CACHE_DYNAMIC_NAME = 'dynamic-07'
 
 self.addEventListener('install', function (event) {
@@ -43,7 +43,15 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
     event.respondWith(
-        caches.match(event.request) // requests are the keys, request object
+        fetch(event.request)
+            .catch(function(err) {
+               return caches.match(event.request)
+            })
+    );
+})
+
+/*
+caches.match(event.request) // requests are the keys, request object
         .then(function (response) {
             if (response) {
                 return response
@@ -65,5 +73,4 @@ self.addEventListener('fetch', function (event) {
                     })
             }
         })
-    );
-})
+*/
