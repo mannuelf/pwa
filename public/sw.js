@@ -1,4 +1,4 @@
-const CACHE_STATIC_NAME = 'static-08'
+const CACHE_STATIC_NAME = 'static-09'
 const CACHE_DYNAMIC_NAME = 'dynamic-07'
 
 self.addEventListener('install', function (event) {
@@ -41,36 +41,31 @@ self.addEventListener('activate', function (event) {
     return self.clients.claim();
 })
 
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch', function(event) {
     event.respondWith(
         fetch(event.request)
+            .then(function(res) {
+                return caches.open(CACHE_DYNAMIC_NAME)
+                        .then(function(cache) {
+                            cache.put(event.request.url, res.clone())
+                            return res;
+                        })
+            })
             .catch(function(err) {
-               return caches.match(event.request)
+                return caches.match(event.request);
             })
     );
 })
 
-/*
-caches.match(event.request) // requests are the keys, request object
-        .then(function (response) {
-            if (response) {
-                return response
-            } else {
+self.addEventListener('fetch', function(event) {
+    event.respondsWith(
+        caches.open(CACHE_DYNAMIC_NAME)
+            .then(function(cache) {
                 return fetch(event.request)
-                    .then(function (res) {
-                        return caches.open(CACHE_DYNAMIC_NAME)
-                            .then(function (cache) {
-                                cache.put(event.request.url, res.clone())
-                                return res
-                            })
+                    .then(function(res) {
+                        cache.put(event.request, res.clone());
+                        return res;
                     })
-                    .catch(function (err) {
-                        return caches.open(CACHE_STATIC_NAME)
-                            .then(function(cache) {
-                                return cache.match('/offline.html')
-                            })
-                        console.log('error: ', err)
-                    })
-            }
-        })
-*/
+            })
+    )
+})
